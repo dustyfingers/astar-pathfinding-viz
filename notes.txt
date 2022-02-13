@@ -1,0 +1,7 @@
+a* uses a weighted graph to determine which path is most important
+
+h score - h(n) gives us an estimate of the distance from node n to the end node
+g score - g(n) gives us the current shortest distance to get from the start node to node n
+f score - f(n) is g(n) + h(n) 
+
+f score is used to determine which node to explore next
