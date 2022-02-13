@@ -76,7 +76,7 @@ class Spot:
     # general utils
     
     def reset(self):
-        self.color == WHITE
+        self.color = WHITE
         
     def draw(self, win):
         pygame.draw.rect(win, self.color, (self.x, self.y, self.width, self.width))
@@ -190,7 +190,17 @@ def main(win, width):
                 
             # handle right mouse button clicking
             elif pygame.mouse.get_pressed()[2]:
-                pass
+                pos = pygame.mouse.get_pos()
+                row, col = get_clicked_pos(pos, ROWS, width)
+                
+                spot = grid[row][col]
+                
+                spot.reset()
+                
+                if spot == start:
+                    start = None
+                elif spot == end:
+                    end = None
                   
     pygame.quit()
 
