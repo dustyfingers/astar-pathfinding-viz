@@ -179,6 +179,12 @@ def get_clicked_pos(pos, rows, width):
     return row, col
 
 
+def reconstruct_path(came_from, current, draw):
+    while current in came_from:
+        current = came_from[current]
+        current.make_path()
+        draw()
+
 # we can call draw as a function here becuase it was passed in as a lambda (an anonymous function)
 def astar(draw, grid, start, end):
     count = 0
@@ -206,7 +212,8 @@ def astar(draw, grid, start, end):
         open_set_hash.remove(current)
         
         if current == end:
-            # TODO: draw path here
+            reconstruct_path(came_from, end, draw)
+            end.make_end()
             return True
         
         for neighbor in current.neighbors:
@@ -240,16 +247,12 @@ def main(win, width):
     end = None
     
     run = True
-    started = False
     
     while run:
         draw(win, grid, ROWS, width)
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 run = False
-                
-            if started:
-                continue
             
             # handle left mouse button clicking
             if pg.mouse.get_pressed()[0]:
@@ -270,7 +273,7 @@ def main(win, width):
                     spot.make_barrier()  
                 
             # handle right mouse button clicking
-            elif pg.mouse.get_pressed()[2]:
+            if pg.mouse.get_pressed()[2]:
                 pos = pg.mouse.get_pos()
                 row, col = get_clicked_pos(pos, ROWS, width)
                 
@@ -283,14 +286,22 @@ def main(win, width):
                 elif spot == end:
                     end = None
                     
-            # handle spacebar pressed
-            elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_SPACE and not started:
+
+            if event.type == pg.KEYDOWN:
+                
+                # handle spacebar pressed
+                if event.key == pg.K_SPACE and start and end:
                     for row in grid:
                         for spot in row:
                             spot.update_neighbors(grid)
                     
                     astar(lambda: draw(win, grid, ROWS, width), grid, start, end)
+            
+                # handle manual user reset
+                if event.key == pg.K_c or event.key == pg.K_q:
+                    start = None
+                    end = None
+                    grid = make_grid(ROWS, width)
                   
     pg.quit()
 
